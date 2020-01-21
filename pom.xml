@@ -7,8 +7,6 @@
     <groupId>automate-means-llz</groupId>
     <artifactId>automates</artifactId>
     <version>1.0-SNAPSHOT</version>
-
-
             <dependencies>
 
                 <dependency>
@@ -35,11 +33,7 @@
                     <artifactId>poi-ooxml</artifactId>
                     <version>3.17</version>
                 </dependency>
-                <!--<dependency>-->
-                    <!--<groupId>test</groupId>-->
-                    <!--<artifactId>test</artifactId>-->
-                    <!--<version>1.0-SNAPSHOT</version>-->
-                <!--</dependency>-->
+
 
                 <dependency>
                     <groupId>com.101tec</groupId>
@@ -47,5 +41,18 @@
                     <artifactId>zkclient</artifactId>
                     <version>0.10</version>
                 </dependency>
+
+                <!-- spring -->
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                    <version>4.3.11.RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>4.1.0.RELEASE</version>
+                </dependency>
             </dependencies>
+
 </project>
