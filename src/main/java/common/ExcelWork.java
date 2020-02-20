@@ -4,15 +4,12 @@ package common;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -32,61 +29,69 @@ public class ExcelWork {
     public String getTestData(String excelPath, String sheetName) throws Exception {
         //读取Excel
         XSSFWorkbook xssfWorkbook = readExcel.getReadRes(excelPath);
+        //获取test sheet
+        XSSFSheet xssfSheet = xssfWorkbook.getSheet(sheetName);
 
         //获取Excel数据
-        getData(sheetName, xssfWorkbook);
+            //获取表头数据
 
-        log.info("信息:{}", excelPath);
+        List<String> headData = getHeadData(xssfSheet);
+        log.info("获取的表头信息:{}", headData);
 
+            //获取测试数据
+        List<List<String>> testData = getTestData(xssfSheet);
+        log.info("获取的测试数据:{}",testData);
 
         return null;
     }
 
-    public static List<String> getData(String sheetName, XSSFWorkbook xssfWorkbook) throws Exception {
-        XSSFSheet xssfSheet = xssfWorkbook.getSheet(sheetName);
+
+    //获取表头数据
+    public static List<String> getHeadData(XSSFSheet xssfSheet) throws Exception {
+
 
         if (xssfSheet == null) {
-            throw new NullPointerException("There is no sheet named '" + sheetName + "' exists in the excel, please create it before your test!");
+            throw new NullPointerException("There is no sheet named '" + xssfSheet.getSheetName() + "' exists in the excel, please create it before your test!");
         } else {
             List<String> headList = new ArrayList<String>();
             Row row = xssfSheet.getRow(xssfSheet.getFirstRowNum());
             if (row==null){
                 return headList;
            }
-           for (int j = xssfSheet.getFirstRowNum(); j < xssfSheet.getPhysicalNumberOfRows(); j++){
-               Cell cell = row.getCell(j);
-               headList.add(getCellValue(cell));
+           for (int l = row.getFirstCellNum(); l <row.getLastCellNum(); l++){
+               Cell cell = row.getCell(l);
+               if (cell!=null) {
+                   headList.add(getCellValue(cell));
+               }
            }
-           return null;
+           return headList;
         }
     }
 
-//    public static void init(XSSFSheet xssfSheet) {
-//        int rowCount = 0;
-//        int colCount = 0;
-//        XSSFRow topRow;
-//        XSSFCell xssfCell;
-//        while (true) {
-//            topRow = xssfSheet.getRow(rowCount);
-//            if (topRow == null) {
-//                break;
-//            }
-//
-//            xssfCell = topRow.getCell(0);
-//            topRow = xssfSheet.getRow(0);
-//            while (true) {
-//                xssfCell = topRow.getCell(colCount);
-//                if (xssfCell==null){
-//                    break;
-//                }
-//            }
-//        }
-//    }
+
+    //获取测试数据
+    public static List<List<String>> getTestData(XSSFSheet xssfSheet) throws Exception {
+
+        List<List<String>> testData = new ArrayList<List<String>>();
+        for (int h = xssfSheet.getFirstRowNum() + 1; h <= xssfSheet.getLastRowNum(); h++) {
+            for (int l = xssfSheet.getRow(h).getFirstCellNum(); l < xssfSheet.getRow(h).getPhysicalNumberOfCells(); l++) {
+                if (l != -1) {
+                    Cell cell = xssfSheet.getRow(h).getCell(l);
+                    List<String> everyData = new ArrayList<String>();
+                    if (cell != null) {
+                        everyData.add(getCellValue(cell));
+                    }
+                    testData.add(everyData);
+                }
+            }
+        }
+                return testData;
+    }
 
 
-
+    //字段处理
     public static String getCellValue(Cell cell) throws Exception{
-        String cellValue = "";
+        String cellValue = null;
         if (cell==null){
             return cellValue;
         }
@@ -99,6 +104,7 @@ public class ExcelWork {
                 cellValue = String.valueOf(cell.getNumericCellValue()).trim();
                 break;
             case  Cell.CELL_TYPE_STRING:
+                // 把返回的泛型转换成字符串，trim() 去掉尾部空格、特殊字符等。
                 cellValue = String.valueOf(cell.getStringCellValue()).trim();
                 break;
         }
